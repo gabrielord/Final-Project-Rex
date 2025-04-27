@@ -115,9 +115,9 @@ def _deletion_insertion_curve(
     if mode not in {"deletion", "insertion"}:
         raise ValueError("mode must be 'deletion' or 'insertion'")
 
-    device  = x.device
+    device = x.device
     sal_flat = torch.from_numpy(sal).to(device).flatten()
-    order    = sal_flat.argsort(descending=True)  # most-important first
+    order = sal_flat.argsort(descending=True) 
 
     _, _, H, W = x.shape
     pix_per   = max(1, (H * W) // steps)
@@ -136,7 +136,7 @@ def _deletion_insertion_curve(
         y, xcoord = idx // W, idx % W
         if mode == "deletion":
             mod[:, :, y, xcoord] = 0
-        else:                                           # insertion
+        else: # insertion
             mod[:, :, y, xcoord] = x[:, :, y, xcoord]
     return scores
 
@@ -150,7 +150,7 @@ def _auc(curve, mode):
 def evaluate_method(
     model: torch.nn.Module,
     loader: torch.utils.data.DataLoader,
-    explainer_fn,                         # (tensor, cls) → saliency (H,W)
+    explainer_fn, # (tensor, cls) → saliency (H,W)
     name: str,
     device: torch.device,
     max_imgs: int = 30,
@@ -170,7 +170,7 @@ def evaluate_method(
 
             sal = explainer_fn(img1, cls)              # H × W
             sal = (sal - sal.min()) / (sal.max() - sal.min() + 1e-8)
-            sal = sal.astype(np.float32)
+            # sal = sal.astype(np.float32)
 
             d_curve = _deletion_insertion_curve(model, img1, sal, cls, "deletion",  steps)
             i_curve = _deletion_insertion_curve(model, img1, sal, cls, "insertion", steps)

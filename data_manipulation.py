@@ -31,7 +31,6 @@ class PatchCamelyonH5Dataset(Dataset):
         self.y_path = y_path
         self.transform = transform
 
-        # abre só para descobrir o comprimento
         with h5py.File(self.x_path, "r") as fx:
             self.len = fx["x"].shape[0]
 
@@ -39,13 +38,12 @@ class PatchCamelyonH5Dataset(Dataset):
         return self.len
 
     def __getitem__(self, idx):
-        # abre-fecha rapidamente a cada acesso
         with h5py.File(self.x_path, "r") as fx, h5py.File(self.y_path, "r") as fy:
-            img = fx["x"][idx]          # uint8 H×W×3
+            img = fx["x"][idx] # uint8 H×W×3
             lbl = fy["y"][idx].squeeze()
 
-        img = torch.from_numpy(img).float() / 255.0     # 0-1
-        img = img.permute(2, 0, 1)                      # CHW
+        img = torch.from_numpy(img).float() / 255.0 # 0-1
+        img = img.permute(2, 0, 1) # CHW
 
         if self.transform is not None:
             img = self.transform(img)
